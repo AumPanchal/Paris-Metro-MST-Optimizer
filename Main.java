@@ -1,89 +1,88 @@
 // Aum Panchal 400416468
 
-
-// Expensive Subway problem (P2-part A)
-// Startup code given in the Fall 2025 for csi2110/csi2510
-// This file only contains basic commands to read the data from the input files.
-// Use and modify it freely
-// 
-// Do not forget to add your name and student number on each program file you submit
-//
+// Expensive Subway problem
 
 import java.util.Scanner;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 
 class Main {
 
-    public static void main(String[] args) {
+  public static void main (String[] args) {
 
 
-      Scanner scanner = new Scanner(System.in); // Note that for Online Judge the input must be given in the standard I/O
-            // to read from input files use the command 'java Main < test1.txt', test1.txt should be in the same folder
-                                
+    Scanner scanner = new Scanner(System.in); // Note that for Online Judge the input must be given in the standard I/O
+          // to read from input files use the command 'java Main < test1.txt', test1.txt should be in the same folder
+                              
 
-      int nv, ne; 
+    int nv, ne; 
 
-      while (true) {
 
-        nv = scanner.nextInt();
-        ne = scanner.nextInt();
-        
-        if ((nv==0) && (ne==0)) break;
-        
-        HashMap<String, Integer> map = new HashMap<>();
-        ArrayList<Edge> edges = new ArrayList<>(); 
+    while (true) { // This loop repeats for each problem that is included in the same input file (until 0 0 is read)
 
-        for (int v=0; v<nv; v++) {
-            String vName = scanner.next(); 
-            map.put(vName, v);
-        }
+      nv=scanner.nextInt(); // read number of vertices
+      ne=scanner.nextInt(); // read number of edges
+      // System.out.println(nv +" " + ne);
+      if ((nv==0) & (ne==0)) break; // if both are zero it is indication to stop 
+      
 
-        for (int i=0; i<ne; i++) {
-            String uName = scanner.next(); 
-            String vName = scanner.next(); 
-            int w = scanner.nextInt(); 
-            
-            int u = map.get(uName);
-            int v = map.get(vName);
-            
-            edges.add(new Edge(u, v, w));
-        } 
-
-        String home = scanner.next();
-
-        Collections.sort(edges);
-
-        Partition<Integer> p = new Partition<>();
-        Node<Integer>[] nodes = new Node[nv];
-
-        for (int i = 0; i < nv; i++) {
-            nodes[i] = p.makeCluster(i);
-        }
-
-        int totalCost = 0;
-        int edgesCount = 0;
-
-        for (Edge e : edges) {
-            Node<Integer> uNode = nodes[e.u];
-            Node<Integer> vNode = nodes[e.v];
-
-            if (p.find(uNode) != p.find(vNode)) {
-                p.union(uNode, vNode);
-                totalCost += e.weight;
-                edgesCount++;
-            }
-        }
-        
-        if (edgesCount == nv - 1 || nv <= 1) {
-            System.out.println(totalCost);
-        } else {
-            System.out.println("Impossible");
-        }
-
+      ArrayList<String> vertexNames=new ArrayList<String>(); // reading vertex names into an Array List
+      ArrayList<Edge> edges = new ArrayList<Edge>(); // <-- keeps track of connections
+      for (int v=0; v<nv; v++) {
+        String vName = scanner.next(); // here a vertex name is read
+        vertexNames.add(vName);  
+        // System.out.println(vName);
       }
+
+      // you should do something here to add the vertices to the graph
+
+      for (int e=0; e<ne; e++) {
+        String v1Name = scanner.next(); // a vertex name that is one end of the edge
+        String v2Name = scanner.next(); // a vertex name that is the other end of the edge
+        int weight=scanner.nextInt(); // edge weight is given
+        // System.out.println(v1Name+" "+v2Name+" "+weight);
+
+        int u = vertexNames.indexOf(v1Name); // <-- find id
+        int v = vertexNames.indexOf(v2Name); // <-- find id
+
+        edges.add(new Edge(u, v, weight)); // <-- add edge to list
+      } 
+
+      String home=scanner.next(); // here is the name of the vertex of Peter's home
+      // System.out.println(home);
+
+      Collections.sort(edges); // <-- sort edges by weight
+      
+      Partition<String> partition = new Partition<String>(); // <-- create partition structure
+      Node<String>[] positions = new Node[nv]; // <-- array to keep track of positions in partition
+
+      for (int i = 0; i < nv; i++) {
+        positions[i] = partition.makeCluster(vertexNames.get(i)); // <-- make each vertex its own cluster
+      }
+
+      int totalCost = 0;
+      int edgesUsed = 0;
+
+      for (Edge edge : edges) {
+        Node<String> uPos = positions[edge.u];
+        Node<String> vPos = positions[edge.v];
+
+        if (partition.find(uPos) != partition.find(vPos)) { // <-- if they are in different clusters
+          partition.union(uPos, vPos); // <-- union the clusters
+          totalCost += edge.weight; // <-- add weight to total cost
+          edgesUsed++; // <-- increment edges used
+        }
+      }
+
+      if (edgesUsed == nv - 1 || nv <= 1) { // <-- check if all vertices are connected
+        System.out.println(totalCost); // <-- print total cost if all vertices are connected
+      } else {
+        System.out.println("Impossible"); // <-- otherwise print Impossible
+      }
+      
+    }
 
    }
 
